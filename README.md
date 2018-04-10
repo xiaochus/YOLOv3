@@ -1,5 +1,7 @@
 # YOLOv3
-Keras(TF backend) implementation of yolo v3 objects detection. According to the paper [YOLOv3: An Incremental Improvement](https://pjreddie.com/media/files/papers/YOLOv3.pdf).
+Keras(TF backend) implementation of yolo v3 objects detection. 
+
+According to the paper [YOLOv3: An Incremental Improvement](https://pjreddie.com/media/files/papers/YOLOv3.pdf).
 
 ## Requirement
 - OpenCV 3.4
@@ -9,9 +11,9 @@ Keras(TF backend) implementation of yolo v3 objects detection. According to the 
 
 ## Quick start
 
-- Download official [yolov3.weights](https://pjreddie.com/media/files/yolov3.weights).
+- Download official [yolov3.weights](https://pjreddie.com/media/files/yolov3.weights) and put it on top floder of project.
 
-- Run the follow commadn to convert darknet weight file to keras h5 file. The `yad2k.py` was modified from [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+- Run the follow command to convert darknet weight file to keras h5 file. The `yad2k.py` was modified from [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
 ```
 python yad2k.py cfg\yolo.cfg yolov3.weights data\yolo.h5
 ```
@@ -23,9 +25,9 @@ python demo.py
 
 ## Demo result
 
+It can be seen that yolo v3 has a better classification ability than yolo v2.
 
-![res](/images/test/res/dog.png)
-
+<img width="350" height="300" src="/images/test/res/dog.png"/><img width="350" height="300" src="/images/test/res/person.png"/>
 
 ## TODO
 
