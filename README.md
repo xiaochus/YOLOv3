@@ -18,7 +18,7 @@ According to the paper [YOLOv3: An Incremental Improvement](https://pjreddie.com
 python yad2k.py cfg\yolo.cfg yolov3.weights data\yolo.h5
 ```
 
-- run follow command to show the demo.
+- run follow command to show the demo. The result can be found in `images\res\` floder.
 ```
 python demo.py
 ```
@@ -27,7 +27,7 @@ python demo.py
 
 It can be seen that yolo v3 has a better classification ability than yolo v2.
 
-<img width="350" height="300" src="/images/test/res/dog.png"/><img width="350" height="300" src="/images/test/res/person.png"/>
+<img width="400" height="350" src="/images/res/dog.jpg"/><img width="400" height="350" src="/images/res/person.jpg"/>
 
 ## TODO
 

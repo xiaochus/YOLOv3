@@ -169,6 +169,9 @@ class YOLO:
             nclasses.append(c[keep])
             nscores.append(s[keep])
 
+        if not nclasses and not nscores:
+            return None, None, None
+
         boxes = np.concatenate(nboxes)
         classes = np.concatenate(nclasses)
         scores = np.concatenate(nscores)

@@ -67,43 +67,78 @@ def draw(image, boxes, scores, classes, all_classes):
                     0.6, (0, 0, 255), 1,
                     cv2.LINE_AA)
 
+        print('class: {0}, score: {1:.2f}'.format(all_classes[cl], score))
+        print('box coordinate x,y,w,h: {0}'.format(box))
 
-def detect():
+    print()
+
+
+def detect_image(image, yolo, all_classes):
     """Use yolo v3 to detect images.
+
+    # Argument:
+        image: original image.
+        yolo: YOLO, yolo model.
+        all_classes: all classes name.
+
+    # Returns:
+        image: processed image.
     """
+    pimage = process_image(image)
+
+    start = time.time()
+    boxes, classes, scores = yolo.predict(pimage, image.shape)
+    end = time.time()
+
+    print('time: {0:.2f}s'.format(end - start))
+
+    if boxes is not None:
+        draw(image, boxes, scores, classes, all_classes)
+
+    return image
+
+
+def detect_vedio(video, yolo, all_classes):
+    """Use yolo v3 to detect video.
+
+    # Argument:
+        video: video file.
+        yolo: YOLO, yolo model.
+        all_classes: all classes name.
+    """
+    camera = cv2.VideoCapture(video)
+    cv2.namedWindow("detection", cv2.WINDOW_NORMAL)
+
+    while True:
+        res, frame = camera.read()
+
+        if not res:
+            break
+
+        image = detect_image(frame, yolo, all_classes)
+        cv2.imshow("detection", image)
+
+        if cv2.waitKey(110) & 0xff == 27:
+                break
+
+    camera.release()
+
+
+if __name__ == '__main__':
     yolo = YOLO(0.6, 0.5)
     file = 'data/coco_classes.txt'
     all_classes = get_classes(file)
 
-    res = []
+    # detect images in test floder.
     for (root, dirs, files) in os.walk('images/test'):
         if files:
             for f in files:
                 print(f)
                 path = os.path.join(root, f)
                 image = cv2.imread(path)
-                pimage = process_image(image)
+                image = detect_image(image, yolo, all_classes)
+                cv2.imwrite('images/res/' + f, image)
 
-                start = time.time()
-                boxes, classes, scores = yolo.predict(pimage, image.shape)
-                end = time.time()
-
-                print(boxes)
-                print(classes)
-                print(scores)
-                print(end - start)
-
-                draw(image, boxes, scores, classes, all_classes)
-
-                res.append(image)
-
-    for r in res:
-        cv2.namedWindow("detection")
-        while True:
-            cv2.imshow("detection", r)
-            if cv2.waitKey(110) & 0xff == 27:
-                break
-
-
-if __name__ == '__main__':
-    detect()
+    # detect vedio.
+    video = 'E:/video/car.flv'
+    detect_vedio(video, yolo, all_classes)
