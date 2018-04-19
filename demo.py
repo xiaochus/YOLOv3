@@ -140,5 +140,7 @@ if __name__ == '__main__':
                 cv2.imwrite('images/res/' + f, image)
 
     # detect vedio.
+    """
     video = 'E:/video/car.flv'
     detect_vedio(video, yolo, all_classes)
+    """

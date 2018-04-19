@@ -14,7 +14,7 @@ from collections import defaultdict
 import numpy as np
 from keras import backend as K
 from keras.layers import (Conv2D, GlobalAveragePooling2D, Input, Reshape,
-                          UpSampling2D, Activation)
+                          ZeroPadding2D, UpSampling2D, Activation)
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.merge import concatenate, add
 from keras.layers.normalization import BatchNormalization
@@ -101,6 +101,7 @@ def _main(args):
     weight_decay = float(cfg_parser['net_0']['decay']
                          ) if 'net_0' in cfg_parser.sections() else 5e-4
     count = 0
+
     for section in cfg_parser.sections():
         print('Parsing section {}'.format(section))
         if section.startswith('convolutional'):
@@ -110,9 +111,6 @@ def _main(args):
             pad = int(cfg_parser[section]['pad'])
             activation = cfg_parser[section]['activation']
             batch_normalize = 'batch_normalize' in cfg_parser[section]
-
-            # padding='same' is equivalent to Darknet pad=1
-            padding = 'same' if pad == 1 else 'valid'
 
             # Setting weights.
             # Darknet serializes convolutional weights as:
@@ -174,6 +172,11 @@ def _main(args):
                     'Unknown activation function `{}` in section {}'.format(
                         activation, section))
 
+            padding = 'same' if pad == 1 and stride == 1 else 'valid'
+            # Adjust padding model for darknet.
+            if stride == 2:
+                prev_layer = ZeroPadding2D(((1, 0), (1, 0)))(prev_layer)
+
             # Create Conv2D layer
             conv_layer = (Conv2D(
                 filters, (size, size),
@@ -187,6 +190,7 @@ def _main(args):
             if batch_normalize:
                 conv_layer = (BatchNormalization(
                     weights=bn_weight_list))(conv_layer)
+
             prev_layer = conv_layer
 
             if activation == 'linear':
