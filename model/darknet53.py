@@ -2,7 +2,7 @@
 """
 from keras.models import Model
 from keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dense
-from keras.layers import Flatten, add, Activation, BatchNormalization
+from keras.layers import add, Activation, BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
 from keras.regularizers import l2
 
@@ -48,7 +48,7 @@ def residual_block(inputs, filters):
         Output tensor.
     """
     x = conv2d_unit(inputs, filters, (1, 1))
-    x = conv2d_unit(inputs, 2 * filters, (3, 3))
+    x = conv2d_unit(x, 2 * filters, (3, 3))
     x = add([inputs, x])
     x = Activation('linear')(x)
 
