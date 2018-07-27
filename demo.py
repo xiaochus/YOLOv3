@@ -98,7 +98,7 @@ def detect_image(image, yolo, all_classes):
     return image
 
 
-def detect_vedio(video, yolo, all_classes):
+def detect_video(video, yolo, all_classes):
     """Use yolo v3 to detect video.
 
     # Argument:
@@ -106,8 +106,18 @@ def detect_vedio(video, yolo, all_classes):
         yolo: YOLO, yolo model.
         all_classes: all classes name.
     """
-    camera = cv2.VideoCapture(video)
-    cv2.namedWindow("detection", cv2.WINDOW_NORMAL)
+    video_path = os.path.join("videos", "test", video)
+    camera = cv2.VideoCapture(video_path)
+    cv2.namedWindow("detection", cv2.WINDOW_AUTOSIZE)
+
+    # Prepare for saving the detected video
+    sz = (int(camera.get(cv2.CAP_PROP_FRAME_WIDTH)),
+        int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    fourcc = cv2.VideoWriter_fourcc(*'mpeg')
+
+    
+    vout = cv2.VideoWriter()
+    vout.open(os.path.join("videos", "res", video), fourcc, 20, sz, True)
 
     while True:
         res, frame = camera.read()
@@ -118,10 +128,15 @@ def detect_vedio(video, yolo, all_classes):
         image = detect_image(frame, yolo, all_classes)
         cv2.imshow("detection", image)
 
+        # Save the video frame by frame
+        vout.write(image)
+
         if cv2.waitKey(110) & 0xff == 27:
                 break
 
+    vout.release()
     camera.release()
+    
 
 
 if __name__ == '__main__':
@@ -129,6 +144,7 @@ if __name__ == '__main__':
     file = 'data/coco_classes.txt'
     all_classes = get_classes(file)
 
+    '''
     # detect images in test floder.
     for (root, dirs, files) in os.walk('images/test'):
         if files:
@@ -139,8 +155,9 @@ if __name__ == '__main__':
                 image = detect_image(image, yolo, all_classes)
                 cv2.imwrite('images/res/' + f, image)
 
-    # detect vedio.
-    """
-    video = 'E:/video/car.flv'
-    detect_vedio(video, yolo, all_classes)
-    """
+	'''
+
+    # detect videos one at a time in videos/test folder    
+    video = 'library1.mp4'
+    detect_video(video, yolo, all_classes)
+    
