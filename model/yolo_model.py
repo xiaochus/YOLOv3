@@ -16,7 +16,8 @@ class YOLO:
         self._t1 = obj_threshold
         self._t2 = nms_threshold
         self._yolo = load_model('data/yolo.h5')
-
+    def _sigmoid(self,x):
+        return 1 / (1 + np.exp(-x))
     def _process_feats(self, out, anchors, mask):
         """process output features.
 
@@ -34,14 +35,13 @@ class YOLO:
 
         anchors = [anchors[i] for i in mask]
         # Reshape to batch, height, width, num_anchors, box_params.
-        anchors_tensor = K.reshape(K.variable(anchors),
-                                   [1, 1, len(anchors), 2])
         out = out[0]
-        box_xy = K.get_value(K.sigmoid(out[..., :2]))
-        box_wh = K.get_value(K.exp(out[..., 2:4]) * anchors_tensor)
-        box_confidence = K.get_value(K.sigmoid(out[..., 4]))
+        box_xy = self._sigmoid(out[..., :2])
+        box_wh = np.exp(out[..., 2:4]) 
+        box_wh = box_wh * anchors
+        box_confidence = self._sigmoid(out[..., 4])
         box_confidence = np.expand_dims(box_confidence, axis=-1)
-        box_class_probs = K.get_value(K.sigmoid(out[..., 5:]))
+        box_class_probs = self._sigmoid(out[..., 5:])
 
         col = np.tile(np.arange(0, grid_w), grid_w).reshape(-1, grid_w)
         row = np.tile(np.arange(0, grid_h).reshape(-1, 1), grid_h)
