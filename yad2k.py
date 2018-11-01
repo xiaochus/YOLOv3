@@ -209,6 +209,9 @@ def _main(args):
         elif section.startswith('route'):
             ids = [int(i) for i in cfg_parser[section]['layers'].split(',')]
             layers = [all_layers[i] for i in ids]
+            for i, item in enumerate(ids):
+                if item != -1:
+                    ids[i] = item + 1
 
             if len(layers) > 1:
                 print('Concatenating route layers:', layers)
