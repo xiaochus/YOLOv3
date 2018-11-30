@@ -16,8 +16,18 @@ class YOLO:
         self._t1 = obj_threshold
         self._t2 = nms_threshold
         self._yolo = load_model('data/yolo.h5')
-    def _sigmoid(self,x):
+
+    def _sigmoid(self, x):
+        """sigmoid.
+
+        # Arguments
+            x: Tensor.
+
+        # Returns
+            numpy ndarray.
+        """
         return 1 / (1 + np.exp(-x))
+
     def _process_feats(self, out, anchors, mask):
         """process output features.
 
@@ -34,11 +44,14 @@ class YOLO:
         grid_h, grid_w, num_boxes = map(int, out.shape[1: 4])
 
         anchors = [anchors[i] for i in mask]
+        anchors_tensor = np.array(anchors).reshape(1, 1, len(anchors), 2)
+
         # Reshape to batch, height, width, num_anchors, box_params.
         out = out[0]
         box_xy = self._sigmoid(out[..., :2])
-        box_wh = np.exp(out[..., 2:4]) 
-        box_wh = box_wh * anchors
+        box_wh = np.exp(out[..., 2:4])
+        box_wh = box_wh * anchors_tensor
+
         box_confidence = self._sigmoid(out[..., 4])
         box_confidence = np.expand_dims(box_confidence, axis=-1)
         box_class_probs = self._sigmoid(out[..., 5:])

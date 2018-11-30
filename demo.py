@@ -115,7 +115,6 @@ def detect_video(video, yolo, all_classes):
         int(camera.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     fourcc = cv2.VideoWriter_fourcc(*'mpeg')
 
-    
     vout = cv2.VideoWriter()
     vout.open(os.path.join("videos", "res", video), fourcc, 20, sz, True)
 
@@ -138,13 +137,11 @@ def detect_video(video, yolo, all_classes):
     camera.release()
     
 
-
 if __name__ == '__main__':
     yolo = YOLO(0.6, 0.5)
     file = 'data/coco_classes.txt'
     all_classes = get_classes(file)
 
-    '''
     # detect images in test floder.
     for (root, dirs, files) in os.walk('images/test'):
         if files:
@@ -155,9 +152,6 @@ if __name__ == '__main__':
                 image = detect_image(image, yolo, all_classes)
                 cv2.imwrite('images/res/' + f, image)
 
-	'''
-
     # detect videos one at a time in videos/test folder    
     video = 'library1.mp4'
     detect_video(video, yolo, all_classes)
-    
