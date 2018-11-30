@@ -14,7 +14,7 @@ from collections import defaultdict
 import numpy as np
 from keras import backend as K
 from keras.layers import (Conv2D, GlobalAveragePooling2D, Input, Reshape,
-                          ZeroPadding2D, UpSampling2D, Activation)
+                          ZeroPadding2D, UpSampling2D, Activation, Lambda, MaxPooling2D)
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.merge import concatenate, add
 from keras.layers.normalization import BatchNormalization
@@ -198,7 +198,17 @@ def _main(args):
             elif activation == 'leaky':
                 act_layer = LeakyReLU(alpha=0.1)(prev_layer)
                 prev_layer = act_layer
-                all_layers.append(act_layer)
+                all_layers.append(prev_layer)
+
+        elif section.startswith('maxpool'):
+            size = int(cfg_parser[section]['size'])
+            stride = int(cfg_parser[section]['stride'])
+            all_layers.append(
+                MaxPooling2D(
+                    padding='same',
+                    pool_size=(size, size),
+                    strides=(stride, stride))(prev_layer))
+            prev_layer = all_layers[-1]
 
         elif section.startswith('avgpool'):
             if cfg_parser.items(section) != []:
@@ -208,6 +218,11 @@ def _main(args):
 
         elif section.startswith('route'):
             ids = [int(i) for i in cfg_parser[section]['layers'].split(',')]
+            if len(ids) == 2:
+                for i, item in enumerate(ids):
+                    if item != -1:
+                        ids[i] = item + 1
+
             layers = [all_layers[i] for i in ids]
 
             if len(layers) > 1:
@@ -268,9 +283,8 @@ def _main(args):
     if remaining_weights > 0:
         print('Warning: {} unused weights'.format(remaining_weights))
 
-    if args.plot_model:
-        plot(model, to_file='{}.png'.format(output_root), show_shapes=True)
-        print('Saved model plot to {}.png'.format(output_root))
+    plot(model, to_file='{}.png'.format(output_root), show_shapes=True)
+    print('Saved model plot to {}.png'.format(output_root))
 
 
 if __name__ == '__main__':
