@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Misc
+yolov3.weights
+data/yolo.h5
+.DS_Store
